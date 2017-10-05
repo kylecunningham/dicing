@@ -1,5 +1,12 @@
-#Dicing
-#An example, open source game, using AGK3
+"""
+Dicing
+An example, open source game, using AGK3
+Game source by Kyle Cunningham.
+AGK3 by Kyle Cunningham, modified from the original AGK by Mason Armstrong.
+Accept where otherwise noted, all source code is under GPL, version 3.
+See the license file in this repository.
+"""
+
 #imports
 import pygame
 import sys
@@ -60,4 +67,5 @@ class game(object):
 		if res.name == "n":
 			self.main_menu()
 
+#Set up the game.
 game = game(title="Dicing")
