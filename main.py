@@ -12,7 +12,8 @@ import pygame
 import sys
 from AGK.audio import sound
 from AGK.mainframe import window, keyboard
-from AGK.misc import menu
+from AGK.misc import menu, dialog
+from AGK.speech import auto
 
 # The game module
 class game(object):
@@ -46,14 +47,24 @@ class game(object):
 	def main_menu(self):
 		m = menu.menu(select_sound="sounds/menu_select.ogg", move_sound="sounds/menu_move.ogg")
 		m.add_item_tts("Start game","start")
+		m.add_item_tts("Game Credits","credits")
 		m.add_item_tts("exit game","exit")
 		result = m.run("Select an option from the menu.")
 		if result==-1:
 			self.ExitGame()
 		if result.name=="start":
-			self.StartGame()
+			self.SelectTargetScore()
+		if result.name == "credits":
+			self.ShowCredits()
 		if result.name=="exit":
 			self.ExitGame()
+
+	def ShowCredits(self):
+		dialog.dialog("Game credits:", type=2)
+		dialog.dialog("Programming by Kyle Cunningham, www.underworldtech.com.", type=2)
+		dialog.dialog("Music by Eric Matyas, www.soundimage.org.", type=2)
+		dialog.dialog("Sounds from various free sources.", type=2)
+		self.main_menu()
 
 	def ExitGame(self):
 		m = menu.menu(select_sound="sounds/menu_select.ogg", move_sound="sounds/menu_move.ogg")
@@ -66,6 +77,31 @@ class game(object):
 			sys.exit()
 		if res.name == "n":
 			self.main_menu()
+
+	def SelectTargetScore(self):
+		m = menu.menu(select_sound="sounds/menu_select.ogg", move_sound="sounds/menu_move.ogg")
+		m.add_item_tts("Easy (100)","1")
+		m.add_item_tts("medium (500)","2")
+		m.add_item_tts("Difficult (1000)","3")
+		res = m.run("Select a difficulty level.")
+		if res == -1:
+			self.main_menu()
+		if res.name=="1":
+			self.target_score=100
+			self.StartGame()
+		if res.name=="2":
+			self.target_score=500
+			self.StartGame()
+		if res.name=="3":
+			self.target_score=1000
+			self.StartGame()
+
+	def StartGame(self):
+		dialog.dialog("Welcome. Your target score is " + str(self.target_score) + ". Press enter to begin. When in the game, press R to roll the dice when it is your turn. Good luck!", type=2)
+		while 1:
+			key = keyboard.pressed()
+			if key == pygame.K_ESCAPE:
+				self.main_menu()
 
 #Set up the game.
 game = game(title="Dicing")
