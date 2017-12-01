@@ -9,6 +9,7 @@ See the license file in this repository.
 
 #imports
 import pygame
+import random
 import sys
 from AGK.audio import sound
 from AGK.mainframe import window, keyboard
@@ -23,6 +24,7 @@ class game(object):
 	target_score = 0
 	player_round_score = 0
 	computer_round_score=0
+	turn = 1
 	#define some sound objects
 	dice = sound.sound()
 	dice.load("sounds/dice.ogg")
@@ -80,28 +82,46 @@ class game(object):
 
 	def SelectTargetScore(self):
 		m = menu.menu(select_sound="sounds/menu_select.ogg", move_sound="sounds/menu_move.ogg")
-		m.add_item_tts("Easy (100)","1")
-		m.add_item_tts("medium (500)","2")
-		m.add_item_tts("Difficult (1000)","3")
+		m.add_item_tts("Easy (6 rounds)","1")
+		m.add_item_tts("medium (9 rounds)","2")
+		m.add_item_tts("Difficult (12 rounds)","3")
 		res = m.run("Select a difficulty level.")
 		if res == -1:
 			self.main_menu()
 		if res.name=="1":
-			self.target_score=100
+			self.target_score=6
 			self.StartGame()
 		if res.name=="2":
-			self.target_score=500
+			self.target_score=9
 			self.StartGame()
 		if res.name=="3":
-			self.target_score=1000
+			self.target_score=12
 			self.StartGame()
 
 	def StartGame(self):
-		dialog.dialog("Welcome. Your target score is " + str(self.target_score) + ". Press enter to begin. When in the game, press R to roll the dice when it is your turn. Good luck!", type=2)
+		dialog.dialog("Welcome. Your target is " + str(self.target_score) + " rounds. Press enter to begin. When in the game, press R to roll the dice when it is your turn. Good luck!", type=2)
 		while 1:
-			key = keyboard.pressed()
-			if key == pygame.K_ESCAPE:
-				self.main_menu()
+			if self.turn == 1:
+				self.take_player_turn()
+
+	def RollDice(self):
+		self.dice.stop()
+		self.dice.play()
+		return random.randint(1,6)
+
+	#Lets add some game logic.
+	def take_player_turn(self):
+		rolls = 0
+		temp_score = 0
+		auto.speak("Its your turn. Roll three times.")
+		key = keyboard.pressed()
+		if key == pygame.K_r:
+			num = self.RollDice()
+			rolls = rolls + 1
+			temp_score = temp_score + num
+			auto.speak("You got a " + str(num) + ". You have " + str(3 - rolls) + " dice remaining.")
+		if key == pygame.K_ESCAPE:
+			self.main_menu()
 
 #Set up the game.
 game = game(title="Dicing")
